@@ -4,6 +4,8 @@ import { SERVER_PORT } from '../global/environment';
 import socketIO, { Server } from 'socket.io';
 import http from 'http';
 
+import * as socket from './../sockets/sockets';
+
 
 export default class ServerProvider{
 
@@ -20,6 +22,8 @@ export default class ServerProvider{
         this.port = SERVER_PORT;
         this.httpServer = new http.Server( this.app );
         this.io = socketIO( this.httpServer );
+
+        this.listenSockets();
     }
 
     public static get instance(){
@@ -30,6 +34,12 @@ export default class ServerProvider{
         console.log('Escuchando sockets');
         this.io.on('connection', cliente => {
             console.log('Cliente conectado');
+
+            // disconnect 
+            socket.disconnect(cliente);
+
+            // listen messages 
+            socket.message(cliente,this.io);
         });
     }
 
