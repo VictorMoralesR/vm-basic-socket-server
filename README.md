@@ -1,16 +1,16 @@
 # Socket-Server
 
-Reconstruir módulos de node 
+Dependencies install 
 ````
 npm install
 ````
 
-Generar el dist
+Gererate dist directory
 ````
 tsc -w
 ````
 
-Levantar servidor/ cualquiera de estos dos comandos 
+Launch server 
 ````
 nodemon dist/
 node dist/
