@@ -32,17 +32,19 @@ export default class ServerProvider{
 
     private listenSockets(){
         console.log('Escuchando sockets');
-        this.io.on('connection', cliente => {
-            console.log('Cliente conectado');
+        this.io.on('connection', client => {
+            console.log('client connected');
 
             // disconnect 
-            socket.disconnect(cliente);
+            socket.disconnect(client);
 
             // listen messages 
-            socket.message(cliente,this.io);
+            socket.message(client,this.io);
             
             // configure user 
-            socket.configUser(cliente,this.io);
+            socket.configUser(client,this.io);
+
+            socket.connectClient(client);
         });
     }
 
