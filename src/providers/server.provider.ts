@@ -40,6 +40,9 @@ export default class ServerProvider{
 
             // listen messages 
             socket.message(cliente,this.io);
+            
+            // configure user 
+            socket.configUser(cliente,this.io);
         });
     }
 

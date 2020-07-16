@@ -14,3 +14,14 @@ export const message = ( client: Socket, io: socketIO.Server ) => {
         io.emit('new-message', payload);
     });
 };
+// listen message
+export const configUser = ( client: Socket, io: socketIO.Server ) => {
+    client.on('config-user',(payload: { name : string }, callback: Function ) => {
+        console.log('User configuration', payload);
+        callback({
+            ok: true,
+            message: `user ${ payload.name }, config`
+        });
+        // io.emit('new-message', payload);
+    });
+};
