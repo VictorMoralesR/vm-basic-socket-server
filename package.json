@@ -4,6 +4,7 @@
   "description": "node server to real time applications",
   "main": "index.js",
   "scripts": {
+    "start": "node dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Victor Manuel Morales Reyes",
