@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import ServerProvider from '../providers/server.provider';
+import { connectedUsers } from '../sockets/sockets';
 
 const router = Router();
 
@@ -43,6 +44,40 @@ router.post('/messages/:id',(request: Request, response: Response)=>{
         message,
         by,
         id
+    });
+});
+
+router.get('/users',(request: Request, response: Response)=>{
+    const server = ServerProvider.instance;
+    
+    server.io.clients((err:any,users:string[])=>{
+        if(err){
+            return response.json({
+                ok:false,
+                err
+            });
+        }
+        
+        response.json({
+            ok: true,
+            users
+        });
+    });
+});
+router.get('/users/detail',(request: Request, response: Response)=>{
+    const server = ServerProvider.instance;
+    
+    server.io.clients((err:any,users:string[])=>{
+        if(err){
+            return response.json({
+                ok:false,
+                err
+            });
+        }
+        response.json({
+            ok: true,
+            users: connectedUsers.getUserList()
+        });
     });
 });
 
