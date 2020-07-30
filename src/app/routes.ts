@@ -8,10 +8,38 @@ import { Account } from './classes/account';
 import { PublicationController } from './controllers/publications.controller';
 import { AccountsController } from './controllers/accounts.controller';
 
+// server
+const server = ServerProvider.instance;
+
+// jwt 
+const jwt = require('jsonwebtoken');
+
 const router = Router();
+const protectedRoutes = Router(); 
+protectedRoutes.use((req:any, res, next) => {
+    const token = req.headers['access-token'];
+    if (token) {
+      jwt.verify(token, server.app.get('llave'),(err:any, decoded:any) => {      
+        if (err) {
+            return res.json({
+                ok: false,
+                message: 'Invalid token'
+            });    
+        } else {
+          req.decoded = decoded;    
+          next();
+        }
+      });
+    } else {
+        res.send({
+            ok: false,
+            message: 'Token not provided'
+        });
+    }
+});
 
 
-router.get('/messages',(request: Request, response: Response)=>{
+router.get('/messages',protectedRoutes,(request: Request, response: Response)=>{
     response.json({
         ok: true,
         mensaje: 'Todo bien'
@@ -202,17 +230,20 @@ router.post('/auth/signup',(request: Request, response: Response)=>{
     const email = request.body.email;
     const password = request.body.password;
 
+    const token = jwt.sign({check:  true}, server.app.get('llave'), {
+        expiresIn: 1440
+    });
+
     const accountsCtrl = new AccountsController();
     const account: Account = {
         id_group: id_group,
         first_name: first_name,
         last_name: last_name,
         email: email,
-        password: password
+        password: password,
+        token
     }
     accountsCtrl.insert(account).then(newAccount=>{
-        console.log('INSERT ******************** RESP ');
-        console.log(newAccount);
         response.json({
             ok: true,
             data: {

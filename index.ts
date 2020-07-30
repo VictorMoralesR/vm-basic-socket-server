@@ -6,6 +6,10 @@ import DatabaseProvider from "./src/app/providers/database.provider";
 
 const server = ServerProvider.instance;
 const database = DatabaseProvider.instance;
+
+// jwt 
+// TODO: add env file
+server.app.set('llave', 'testpass');
 // body parser 
 server.app.use( bodyParser.urlencoded( { extended: true } ) );
 server.app.use( bodyParser.json() );
