@@ -1,8 +1,8 @@
-import ServerProvider from "./src/providers/server.provider";
+import ServerProvider from "./src/app/providers/server.provider";
 import router from './src/app/routes';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import DatabaseProvider from "./src/providers/database.provider";
+import DatabaseProvider from "./src/app/providers/database.provider";
 
 const server = ServerProvider.instance;
 const database = DatabaseProvider.instance;

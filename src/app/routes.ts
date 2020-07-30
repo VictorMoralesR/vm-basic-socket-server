@@ -1,10 +1,12 @@
 import { Router, Request, Response } from 'express';
-import ServerProvider from '../providers/server.provider';
+import ServerProvider from './providers/server.provider';
 import { connectedUsers } from '../sockets/sockets';
-
+// interfaces
+import { Publication } from './classes/publication';
+import { Account } from './classes/account';
 //controllers
 import { PublicationController } from './controllers/publications.controller';
-import { Publication } from '../classes/publication';
+import { AccountsController } from './controllers/accounts.controller';
 
 const router = Router();
 
@@ -185,6 +187,40 @@ router.get('/publications/:id',(request: Request, response: Response)=>{
             message: 'Database error',
             description: err
         });
+    });
+});
+
+router.post('/auth/signup',(request: Request, response: Response)=>{
+    
+    console.log("********************POST********");
+    console.log(request.body.id_group);
+    console.log(parseInt(request.body.id_group));
+    
+    const id_group = parseInt(request.body.id_group);
+    const first_name = request.body.first_name;
+    const last_name = request.body.last_name;
+    const email = request.body.email;
+    const password = request.body.password;
+
+    const accountsCtrl = new AccountsController();
+    const account: Account = {
+        id_group: id_group,
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: password
+    }
+    accountsCtrl.insert(account).then(newAccount=>{
+        console.log('INSERT ******************** RESP ');
+        console.log(newAccount);
+        response.json({
+            ok: true,
+            data: {
+                account: newAccount
+            }
+        });
+    }).catch( err =>{
+
     });
 });
 

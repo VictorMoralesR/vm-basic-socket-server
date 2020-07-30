@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import socketIO from 'socket.io';
-import UserList from '../providers/user-list.provider';
-import { User } from '../classes/user';
+import UserList from '../app/providers/user-list.provider';
+import { User } from '../app/classes/user';
 
 export const connectedUsers = new UserList();
 

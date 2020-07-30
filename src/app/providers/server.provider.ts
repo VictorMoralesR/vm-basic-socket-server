@@ -1,10 +1,10 @@
 import express from 'express';
-import { SERVER_PORT } from '../global/environment';
+import { SERVER_PORT } from './../../global/environment';
 
 import socketIO, { Server } from 'socket.io';
 import http from 'http';
 
-import * as socket from './../sockets/sockets';
+import * as socket from './../../sockets/sockets';
 
 
 export default class ServerProvider{

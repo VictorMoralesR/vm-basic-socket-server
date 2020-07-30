@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { DB_CONNECTION_STRING } from './../global/environment';
+import { DB_CONNECTION_STRING } from '../../global/environment';
 
 export default class DatabaseProvider{
     private static _instance: DatabaseProvider;
@@ -16,10 +16,10 @@ export default class DatabaseProvider{
     }
 
     public insert(table:string,model:any){
-        return new Promise((resolve, reject)=>{
+        return new Promise<any>((resolve, reject)=>{
             const objInsert = this.getInsertObject(table,model);
             this.pool.query(objInsert.query, objInsert.params, (err, res) => {
-                console.log('INSERT: ', err, res);
+                // console.log('INSERT: ', err, res);
                 // this.pool.end();
                 if(res){
                     resolve(res);
@@ -91,7 +91,7 @@ export default class DatabaseProvider{
             count++;
         }
         return {
-            query: `INSERT INTO ${table} (${strColumns}) VALUES (${strParams})`,
+            query: `INSERT INTO ${table} (${strColumns}) VALUES (${strParams}) RETURNING *`,
             params: arrParams
         };
     }
