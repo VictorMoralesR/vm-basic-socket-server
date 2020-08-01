@@ -30,6 +30,19 @@ export class AccountsController  {
             console.log('ERROR ACIC: ',err);
         });
     }
+    getAccount(objWhere:any){
+        return new Promise((resolve,reject)=>{
+            this.db.select('accounts',objWhere).then(resp=>{
+                if(resp.rowCount){
+                    resolve(resp.rows[0]);
+                } else {
+                    reject('No data');
+                }
+            }).catch(err=>{
+                reject(err);
+            });
+        });
+    }
     // update(publication:Account,objWhere:any){
     //     return new Promise((resolve,reject)=>{
     //         this.db.update('accounts',publication,objWhere);

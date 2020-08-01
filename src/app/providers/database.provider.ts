@@ -69,7 +69,7 @@ export default class DatabaseProvider{
         const arrParams = [];
         for(let field in whereFields){
             // const formatedField = (typeof field === 'number') ? field : `'${field}'`;
-            strWhere += strWhere ? `AND ${field} = $${count}`: `WHERE ${field} = $${count}`;
+            strWhere += strWhere ? ` AND ${field} = $${count}`: `WHERE ${field} = $${count}`;
             arrParams.push(whereFields[field]);
             count++;
         }

@@ -259,5 +259,41 @@ router.post('/auth/signup',(request: Request, response: Response)=>{
 
     });
 });
+router.post('/auth/signin',(request: Request, response: Response)=>{
+    
+    console.log("********************POST********");
+    
+    const email = request.body.email;
+    const password = crypto.createHash('sha256').update(request.body.password).digest('base64');
+
+    const accountsCtrl = new AccountsController();
+    const objWhere: any = {
+        email: email,
+        password: password,
+    }
+    accountsCtrl.getAccount(objWhere).then((validAccount:any)=>{
+        console.log('LOGIN');
+        console.log(validAccount);
+        const token = jwt.sign({check:  true}, server.app.get('llave'), {
+            expiresIn: 1440
+        });
+        validAccount.token = token
+        delete validAccount.password;
+        response.json({
+            ok: true,
+            data: {
+                account: validAccount
+            }
+        });
+    }).catch( err =>{
+        console.log('/auth/signin', err);
+        response.status(400);
+        response.send({
+            ok: false,
+            message: 'Usuario o contraseña incorrectos',
+            description: err
+        });
+    });
+});
 
 export default router;
