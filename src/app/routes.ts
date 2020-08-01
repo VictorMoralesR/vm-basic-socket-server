@@ -11,6 +11,9 @@ import { AccountsController } from './controllers/accounts.controller';
 // server
 const server = ServerProvider.instance;
 
+// hash 
+var crypto = require('crypto');
+
 // jwt 
 const jwt = require('jsonwebtoken');
 
@@ -31,6 +34,7 @@ protectedRoutes.use((req:any, res, next) => {
         }
       });
     } else {
+        res.status(401);
         res.send({
             ok: false,
             message: 'Token not provided'
@@ -184,7 +188,7 @@ router.put('/publications',(request: Request, response: Response)=>{
     });
 });
 
-router.get('/publications',(request: Request, response: Response)=>{
+router.get('/publications',protectedRoutes,(request: Request, response: Response)=>{
     const publication = new PublicationController();
     publication.selectAll().then(resp=>{
         response.json({
@@ -228,7 +232,7 @@ router.post('/auth/signup',(request: Request, response: Response)=>{
     const first_name = request.body.first_name;
     const last_name = request.body.last_name;
     const email = request.body.email;
-    const password = request.body.password;
+    const password = crypto.createHash('sha256').update(request.body.password).digest('base64');
 
     const token = jwt.sign({check:  true}, server.app.get('llave'), {
         expiresIn: 1440
@@ -243,7 +247,8 @@ router.post('/auth/signup',(request: Request, response: Response)=>{
         password: password,
         token
     }
-    accountsCtrl.insert(account).then(newAccount=>{
+    accountsCtrl.insert(account).then((newAccount:any)=>{
+        delete newAccount.password;
         response.json({
             ok: true,
             data: {
