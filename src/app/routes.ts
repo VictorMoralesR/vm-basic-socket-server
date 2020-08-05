@@ -204,7 +204,7 @@ router.get('/publications',protectedRoutes,(request: Request, response: Response
         });
     });
 });
-router.get('/publications/:id',(request: Request, response: Response)=>{
+router.get('/publications/:id',protectedRoutes,(request: Request, response: Response)=>{
     const publication = new PublicationController();
     const id = parseInt(request.params.id);
     publication.getBy({id:id}).then(resp=>{
