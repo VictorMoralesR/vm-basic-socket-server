@@ -1,15 +1,49 @@
 import { Router, Request, Response } from 'express';
-import ServerProvider from '../providers/server.provider';
+import ServerProvider from './providers/server.provider';
 import { connectedUsers } from '../sockets/sockets';
-
+// interfaces
+import { Publication } from './classes/publication';
+import { Account } from './classes/account';
 //controllers
 import { PublicationController } from './controllers/publications.controller';
-import { Publication } from '../classes/publication';
+import { AccountsController } from './controllers/accounts.controller';
+
+// server
+const server = ServerProvider.instance;
+
+// hash 
+var crypto = require('crypto');
+
+// jwt 
+const jwt = require('jsonwebtoken');
 
 const router = Router();
+const protectedRoutes = Router(); 
+protectedRoutes.use((req:any, res, next) => {
+    const token = req.headers['access-token'];
+    if (token) {
+      jwt.verify(token, server.app.get('llave'),(err:any, decoded:any) => {      
+        if (err) {
+            return res.json({
+                ok: false,
+                message: 'Invalid token'
+            });    
+        } else {
+          req.decoded = decoded;    
+          next();
+        }
+      });
+    } else {
+        res.status(401);
+        res.send({
+            ok: false,
+            message: 'Token not provided'
+        });
+    }
+});
 
 
-router.get('/messages',(request: Request, response: Response)=>{
+router.get('/messages',protectedRoutes,(request: Request, response: Response)=>{
     response.json({
         ok: true,
         mensaje: 'Todo bien'
@@ -154,7 +188,7 @@ router.put('/publications',(request: Request, response: Response)=>{
     });
 });
 
-router.get('/publications',(request: Request, response: Response)=>{
+router.get('/publications',protectedRoutes,(request: Request, response: Response)=>{
     const publication = new PublicationController();
     publication.selectAll().then(resp=>{
         response.json({
@@ -170,7 +204,7 @@ router.get('/publications',(request: Request, response: Response)=>{
         });
     });
 });
-router.get('/publications/:id',(request: Request, response: Response)=>{
+router.get('/publications/:id',protectedRoutes,(request: Request, response: Response)=>{
     const publication = new PublicationController();
     const id = parseInt(request.params.id);
     publication.getBy({id:id}).then(resp=>{
@@ -183,6 +217,80 @@ router.get('/publications/:id',(request: Request, response: Response)=>{
         response.json({
             ok: false,
             message: 'Database error',
+            description: err
+        });
+    });
+});
+
+router.post('/auth/signup',(request: Request, response: Response)=>{
+    
+    console.log("********************POST********");
+    console.log(request.body.id_group);
+    console.log(parseInt(request.body.id_group));
+    
+    const id_group = parseInt(request.body.id_group);
+    const first_name = request.body.first_name;
+    const last_name = request.body.last_name;
+    const email = request.body.email;
+    const password = crypto.createHash('sha256').update(request.body.password).digest('base64');
+
+    const token = jwt.sign({check:  true}, server.app.get('llave'), {
+        expiresIn: 1440
+    });
+
+    const accountsCtrl = new AccountsController();
+    const account: Account = {
+        id_group: id_group,
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: password,
+        token
+    }
+    accountsCtrl.insert(account).then((newAccount:any)=>{
+        delete newAccount.password;
+        response.json({
+            ok: true,
+            data: {
+                account: newAccount
+            }
+        });
+    }).catch( err =>{
+
+    });
+});
+router.post('/auth/signin',(request: Request, response: Response)=>{
+    
+    console.log("********************POST********");
+    
+    const email = request.body.email;
+    const password = crypto.createHash('sha256').update(request.body.password).digest('base64');
+
+    const accountsCtrl = new AccountsController();
+    const objWhere: any = {
+        email: email,
+        password: password,
+    }
+    accountsCtrl.getAccount(objWhere).then((validAccount:any)=>{
+        console.log('LOGIN');
+        console.log(validAccount);
+        const token = jwt.sign({check:  true}, server.app.get('llave'), {
+            expiresIn: 1440
+        });
+        validAccount.token = token
+        delete validAccount.password;
+        response.json({
+            ok: true,
+            data: {
+                account: validAccount
+            }
+        });
+    }).catch( err =>{
+        console.log('/auth/signin', err);
+        response.status(400);
+        response.send({
+            ok: false,
+            message: 'Usuario o contraseña incorrectos',
             description: err
         });
     });

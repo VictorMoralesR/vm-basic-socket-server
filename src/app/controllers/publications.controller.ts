@@ -1,5 +1,5 @@
-import { Publication } from "../../classes/publication";
-import DatabaseProvider  from './../../providers/database.provider';
+import { Publication } from "../classes/publication";
+import DatabaseProvider  from '../providers/database.provider';
 
 export class PublicationController  {
     private db = DatabaseProvider.instance;
@@ -38,7 +38,7 @@ export class PublicationController  {
                 if(resp.rowCount){
                     resolve(resp.rows[0]);
                 } else {
-                    resolve(null);
+                    resolve([]);
                 }
             }).catch(err=>{
                 reject(err);
