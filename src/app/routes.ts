@@ -3,9 +3,11 @@ import ServerProvider from './providers/server.provider';
 import { connectedUsers } from '../sockets/sockets';
 // interfaces
 import { Publication } from './classes/publication';
+import { Group } from './classes/group';
 import { Account } from './classes/account';
 //controllers
 import { PublicationController } from './controllers/publications.controller';
+import { GroupController } from './controllers/groups.controller';
 import { AccountsController } from './controllers/accounts.controller';
 
 // server
@@ -295,5 +297,107 @@ router.post('/auth/signin',(request: Request, response: Response)=>{
         });
     });
 });
+
+
+// groups 
+
+router.post('/groups',(request: Request, response: Response)=>{
+    
+    
+    console.log("********************POST********");
+    console.log(request.body.id_group);
+    console.log(parseInt(request.body.id_group));
+    
+    const name = request.body.name;
+    const description = request.body.description;
+    const image = request.body.image;
+
+    const group = new GroupController();
+    const pub: Group = {
+        name,
+        description,
+        image
+    }
+    group.insert(pub).then(resp=>{
+        response.json({
+            ok: true,
+            data: {
+                group: {
+                    name,
+                    description,
+                    image
+                }
+            }
+        });
+    }).catch( err =>{
+
+    });
+});
+
+router.get('/groups',(request: Request, response: Response)=>{
+    const group = new GroupController();
+    group.selectAll().then(resp=>{
+        response.json({
+            ok: true,
+            data: resp
+        });
+    }).catch( err =>{
+        console.log('get /groups', err);
+        response.json({
+            ok: false,
+            message: 'Database error',
+            description: err
+        });
+    });
+});
+
+router.get('/groups/:id',(request: Request, response: Response)=>{
+    const group = new GroupController();
+    const id = parseInt(request.params.id);
+    group.getBy({id:id}).then(resp=>{
+        response.json({
+            ok: true,
+            data: resp
+        });
+    }).catch( err =>{
+        console.log('get /groups', err);
+        response.json({
+            ok: false,
+            message: 'Database error',
+            description: err
+        });
+    });
+});
+
+router.put('/groups',(request: Request, response: Response)=>{
+    console.log("********************PUT********");
+    const id = parseInt(request.body.id);
+    const name = request.body.name;
+    const description = request.body.description;
+    const image = request.body.image;
+
+    const publication = new GroupController();
+    const pub: Group = {
+        name: name,
+        description: description,
+        image: image
+    }
+    publication.update(pub,{id:id}).then(resp=>{
+        response.json({
+            ok: true,
+            data: {
+                publication: {
+                    id,
+                    name,
+                    description,
+                    image
+                }
+            }
+        });
+    }).catch( err =>{
+
+    });
+});
+
 
 export default router;
