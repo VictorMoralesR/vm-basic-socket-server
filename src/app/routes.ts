@@ -5,10 +5,12 @@ import { connectedUsers } from '../sockets/sockets';
 import { Publication } from './classes/publication';
 import { Group } from './classes/group';
 import { Account } from './classes/account';
+import { Membership } from './classes/membership';
 //controllers
 import { PublicationController } from './controllers/publications.controller';
 import { GroupController } from './controllers/groups.controller';
 import { AccountsController } from './controllers/accounts.controller';
+import { MembershipController } from './controllers/memberships.controller';
 
 // server
 const server = ServerProvider.instance;
@@ -377,6 +379,110 @@ router.put('/groups',(request: Request, response: Response)=>{
     const image = request.body.image;
 
     const publication = new GroupController();
+    const pub: Group = {
+        name: name,
+        description: description,
+        image: image
+    }
+    publication.update(pub,{id:id}).then(resp=>{
+        response.json({
+            ok: true,
+            data: {
+                publication: {
+                    id,
+                    name,
+                    description,
+                    image
+                }
+            }
+        });
+    }).catch( err =>{
+
+    });
+});
+// memberships 
+
+router.post('/memberships',(request: Request, response: Response)=>{
+    
+    
+    console.log("********************POST********");
+    console.log(parseInt(request.body.id_term));
+    
+    const name = request.body.name;
+    const description = request.body.description;
+    const id_term = parseInt(request.body.id_term);
+    const price = parseFloat(request.body.price);
+    const content = request.body.content;
+
+    const membership = new MembershipController();
+    const pub: Membership = {
+        name,
+        description,
+        id_term,
+        price,
+        content
+    }
+    membership.insert(pub).then(resp=>{
+        response.json({
+            ok: true,
+            data: {
+                membership: {
+                    name,
+                    description,
+                    id_term,
+                    price,
+                    content
+                }
+            }
+        });
+    }).catch( err =>{
+
+    });
+});
+
+router.get('/memberships',(request: Request, response: Response)=>{
+    const group = new MembershipController();
+    group.selectAll().then(resp=>{
+        response.json({
+            ok: true,
+            data: resp
+        });
+    }).catch( err =>{
+        console.log('get /memberships', err);
+        response.json({
+            ok: false,
+            message: 'Database error',
+            description: err
+        });
+    });
+});
+
+router.get('/memberships/:id',(request: Request, response: Response)=>{
+    const group = new MembershipController();
+    const id = parseInt(request.params.id);
+    group.getBy({id:id}).then(resp=>{
+        response.json({
+            ok: true,
+            data: resp
+        });
+    }).catch( err =>{
+        console.log('get /memberships', err);
+        response.json({
+            ok: false,
+            message: 'Database error',
+            description: err
+        });
+    });
+});
+
+router.put('/memberships',(request: Request, response: Response)=>{
+    console.log("********************PUT********");
+    const id = parseInt(request.body.id);
+    const name = request.body.name;
+    const description = request.body.description;
+    const image = request.body.image;
+
+    const publication = new MembershipController();
     const pub: Group = {
         name: name,
         description: description,
