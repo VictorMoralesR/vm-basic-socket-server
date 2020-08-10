@@ -480,23 +480,29 @@ router.put('/memberships',(request: Request, response: Response)=>{
     const id = parseInt(request.body.id);
     const name = request.body.name;
     const description = request.body.description;
-    const image = request.body.image;
+    const id_term = parseInt(request.body.id_term);
+    const price = parseFloat(request.body.price);
+    const content = request.body.content;
 
-    const publication = new MembershipController();
-    const pub: Group = {
-        name: name,
-        description: description,
-        image: image
+    const membership = new MembershipController();
+    const pub: Membership = {
+        name,
+        description,
+        id_term,
+        price,
+        content
     }
-    publication.update(pub,{id:id}).then(resp=>{
+    membership.update(pub,{id:id}).then(resp=>{
         response.json({
             ok: true,
             data: {
-                publication: {
+                membership: {
                     id,
                     name,
                     description,
-                    image
+                    id_term,
+                    price,
+                    content
                 }
             }
         });
